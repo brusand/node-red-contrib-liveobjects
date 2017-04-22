@@ -6,6 +6,7 @@ Forks of mqtt and http-request to use corporate proxy if env.https_proxy exist.
 
 <h2>install from scratch</h2>
 clone node-red
+* git clone https://github.com/node-red/node-red.git
 
 * npm install
 
@@ -25,7 +26,6 @@ run node-red
 <p>authentification sans cookie. set credential with  LiveObjects  login/password </p>
 * in/lo-mqtt
 <p>subscribe mqtt</p>
-
 
 * output/lo-mqtt
 <p>connection/publish</p>
