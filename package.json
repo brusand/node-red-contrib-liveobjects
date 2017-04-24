@@ -1,5 +1,5 @@
 {
-  "name": "node-red-node-liveobjects",
+  "name": "node-red-contrib-liveobjects",
   "version": "1.0.0",
   "description": "Rest and Mqtt via corporate proxy of LiveObjects api",
   "scripts": {
@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brusand/node-red-node-liveobjects.git"
+    "url": "git+https://github.com/brusand/node-red-contrib-liveobjects.git"
   },
   "keywords": [
     "node-red",
@@ -26,9 +26,9 @@
   "author": "Bruno Darrigues",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/brusand/node-red-node-liveobjects/issues"
+    "url": "https://github.com/brusand/node-red-contrib-liveobjects/issues"
   },
-  "homepage": "https://github.com/brusand/node-red-node-liveobjects#readme",
+  "homepage": "https://github.com/brusand/node-red-contrib-liveobjects#readme",
   "dependencies": {
     "https": "^1.0.0",
     "https-proxy-agent": "^1.0.0",
