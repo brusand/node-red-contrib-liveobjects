@@ -26,17 +26,17 @@ module.exports = function (RED) {
     }
 
     var prox, noprox;
-    if (this.useproxy) {
-      if (!msg.node-input-proxy) {
-        prox = msg.node-input-proxy;
-      }
-      else  {
+    //if (this.useproxy) {
+     // if (!msg.node-input-proxy) {
+      //  prox = msg.node-input-proxy;
+      //}
+     // else  {
         if (process.env.http_proxy != null) { prox = process.env.http_proxy; }
         if (process.env.HTTP_PROXY != null) { prox = process.env.HTTP_PROXY; }
         if (process.env.https_proxy != null) { prox = process.env.https_proxy; }
         if (process.env.HTTPS_PROXY != null) { prox = process.env.HTTPS_PROXY; }
-      }
-    }
+      //}
+    //}
     if (process.env.no_proxy != null) { noprox = process.env.no_proxy.split(","); }
     if (process.env.NO_PROXY != null) { noprox = process.env.NO_PROXY.split(","); }
 
