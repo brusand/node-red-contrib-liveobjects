@@ -13,17 +13,22 @@ module.exports = function (RED) {
     
     var node = this;
     var nodeUrl = n.url;
+    var useProxy = n.useproxy;
+  
     var method = n.method || "GET";
 
     this.ret = n.ret || "txt";
     if (RED.settings.httpRequestTimeout) { this.reqTimeout = parseInt(RED.settings.httpRequestTimeout) || 120000; }
     else { this.reqTimeout = 120000; }
     var payload = null;
+    if (typeof this.useproxy === 'undefined'){
+      this.useproxy = false;
+    }
 
     var prox, noprox;
-    if (n.node-input-useproxy) {
-      if (!n.node-input-proxy) {
-        prox = n.node-input-proxy;
+    if (this.useproxy) {
+      if (!msg.node-input-proxy) {
+        prox = msg.node-input-proxy;
       }
       else  {
         if (process.env.http_proxy != null) { prox = process.env.http_proxy; }
@@ -32,7 +37,6 @@ module.exports = function (RED) {
         if (process.env.HTTPS_PROXY != null) { prox = process.env.HTTPS_PROXY; }
       }
     }
-
     if (process.env.no_proxy != null) { noprox = process.env.no_proxy.split(","); }
     if (process.env.NO_PROXY != null) { noprox = process.env.NO_PROXY.split(","); }
 
@@ -62,10 +66,10 @@ module.exports = function (RED) {
           }
         }
       }
-      var noproxy;
+      var noproxy = true;
       if (noprox) {
         for (var i in noprox) {
-          if (url.indexOf(noprox[i]) !== -1) { noproxy=true; }
+          if (url.indexOf(noprox[i]) !== -1) { noproxy=false; }
         }
       }
       if (prox && !noproxy) {
