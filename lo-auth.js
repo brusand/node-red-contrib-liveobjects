@@ -41,7 +41,7 @@ module.exports = function (RED) {
         if (process.env.no_proxy != null) { noprox = process.env.no_proxy.split(","); }
         if (process.env.NO_PROXY != null) { noprox = process.env.NO_PROXY.split(","); }
         console.log('noprox : ' + noprox)
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
         this.on("input",function(msg) {
             var opts = url.parse(nodeUrl);
             opts.method = method;
@@ -96,6 +96,7 @@ module.exports = function (RED) {
                 }
                 else { node.warn("Bad proxy url: "+process.env.http_proxy); }
             }
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
             var postreq = https.request(opts, function (res) {
                 msg.statusCode = res.statusCode;
                 msg.headers = res.headers;
@@ -126,7 +127,7 @@ module.exports = function (RED) {
                     if (msg.payload.apiKey && msg.payload.apiKey.value) {
                         msg.headers['X-API-KEY'] = msg.payload.apiKey.value;
                         globalContext.set('apiKey', msg.payload.apiKey.value )
-                        console.log('auth api key ' + context.get('apiKey'))
+                        console.log('auth api key ' + globalContext.get('apiKey'))
                     }
 
                     node.send(msg);
