@@ -41,6 +41,7 @@ module.exports = function (RED) {
         if (process.env.no_proxy != null) { noprox = process.env.no_proxy.split(","); }
         if (process.env.NO_PROXY != null) { noprox = process.env.NO_PROXY.split(","); }
         console.log('noprox : ' + noprox)
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         this.on("input",function(msg) {
             var opts = url.parse(nodeUrl);
             opts.method = method;
