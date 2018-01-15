@@ -10,11 +10,11 @@ module.exports = function (RED) {
 
     function HTTPSRequest(n) {
         RED.nodes.createNode(this, n);
+        var globalContext = this.context().global;
 
         var node = this;
         var nodeUrl = n.url;
         var useproxy = n.proxy.length > 0 ? true : false;
-
         var method = n.method || "GET";
 
         this.ret = n.ret || "txt";
@@ -118,11 +118,16 @@ module.exports = function (RED) {
                     if (node.ret === "bin") {
                         msg.payload = new Buffer(msg.payload,"binary");
                     }
-                    else if (node.ret === "obj") {
+                    else if (node.ret === "json") {
                         try { msg.payload = JSON.parse(msg.payload); }
                         catch(e) { node.warn(RED._("httpin.errors.json-error")); }
                     }
-                    if (msg.payload.apiKey && msg.payload.apiKey.value) msg.headers['X-API-KEY'] = msg.payload.apiKey.value;
+                    if (msg.payload.apiKey && msg.payload.apiKey.value) {
+                        msg.headers['X-API-KEY'] = msg.payload.apiKey.value;
+                        globalContext.set('apiKey', msg.payload.apiKey.value )
+                        console.log('auth api key ' + context.get('apiKey'))
+                    }
+
                     node.send(msg);
                     node.status({});
                 });

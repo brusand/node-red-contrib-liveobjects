@@ -32,6 +32,7 @@ module.exports = function(RED) {
 
     function MQTTBrokerNode(n) {
         RED.nodes.createNode(this,n);
+        var globalContext = this.context().global;
 
         // Configuration options passed by Node Red
         this.broker = n.broker;
@@ -182,7 +183,12 @@ module.exports = function(RED) {
         };
 
         this.connect = function () {
+            console.log('connect');
+            //if (flowContext) console.log('apiKey : ' + flowContext.get('apiKey'))
             if (!node.connected && !node.connecting) {
+                if (globalContext && globalContext.get('apiKey') != null) {
+                    node.options.password = globalContext.get('apiKey')||'';
+                }
                 node.connecting = true;
                 node.client = mqtt.connect(node.brokerurl ,node.options);
                 node.client.setMaxListeners(0);
@@ -190,8 +196,11 @@ module.exports = function(RED) {
                 node.client.on('connect', function () {
                     node.connecting = false;
                     node.connected = true;
+                    console.log('connected');
                     node.log(RED._("mqtt.state.connected",{broker:(node.clientid?node.clientid+"@":"")+node.brokerurl}));
+
                     for (var id in node.users) {
+                        console.log('connected user id '+ id);
                         if (node.users.hasOwnProperty(id)) {
                             node.users[id].status({fill:"green",shape:"dot",text:"node-red:common.status.connected"});
                         }
@@ -199,13 +208,17 @@ module.exports = function(RED) {
                     // Remove any existing listeners before resubscribing to avoid duplicates in the event of a re-connection
                     node.client.removeAllListeners('message');
 
+                    console.log('connected re subscribe ' + JSON.stringify(node.subscriptions));
                     // Re-subscribe to stored topics
                     for (var s in node.subscriptions) {
+                        console.log('connected subscription : ' + s);
                         if (node.subscriptions.hasOwnProperty(s)) {
+                            console.log('connected subscription  has prop: ' + s);
                             var topic = s;
                             var qos = 0;
                             for (var r in node.subscriptions[s]) {
                                 if (node.subscriptions[s].hasOwnProperty(r)) {
+                                    console.log('connected subscription  has prop handler: ');
                                     qos = Math.max(qos,node.subscriptions[s][r].qos);
                                     node.client.on('message',node.subscriptions[s][r].handler);
                                 }
@@ -255,6 +268,8 @@ module.exports = function(RED) {
         this.subscribe = function (topic,qos,callback,ref) {
             ref = ref||0;
             node.subscriptions[topic] = node.subscriptions[topic]||{};
+
+            console.log('subscribe topic : ' + topic)
             var sub = {
                 topic:topic,
                 qos:qos,
@@ -266,6 +281,7 @@ module.exports = function(RED) {
                 ref: ref
             };
             node.subscriptions[topic][ref] = sub;
+            console.log('subscribe connected : ' + node.connected)
             if (node.connected) {
                 node.client.on('message',sub.handler);
                 var options = {};
@@ -292,6 +308,7 @@ module.exports = function(RED) {
         };
 
         this.publish = function (msg) {
+            console.log('publish : ' + JSON.stringify(msg))
             if (node.connected) {
                 if (!Buffer.isBuffer(msg.payload)) {
                     if (typeof msg.payload === "object") {
@@ -310,8 +327,8 @@ module.exports = function(RED) {
                     return});
             }
             else {
+                console.log(' publish msg.payload.apiKey  : ' + msg.payload.apiKey.value);
                 if (msg.payload.apiKey) {
-                    node.options.password = msg.payload.apiKey.value;
                     this.connect();
                 }
             }
@@ -343,6 +360,7 @@ module.exports = function(RED) {
 
     function MQTTInNode(n) {
         RED.nodes.createNode(this,n);
+
         this.topic = n.topic;
         this.qos = parseInt(n.qos);
         if (isNaN(this.qos) || this.qos < 0 || this.qos > 2) {
@@ -397,6 +415,7 @@ module.exports = function(RED) {
         if (this.brokerConn) {
             this.status({fill:"red",shape:"ring",text:"node-red:common.status.disconnected"});
             this.on("input",function(msg) {
+                console.log('publish input : ' + JSON.stringify(msg))
                 if (msg.qos) {
                     msg.qos = parseInt(msg.qos);
                     if ((msg.qos !== 0) && (msg.qos !== 1) && (msg.qos !== 2)) {
